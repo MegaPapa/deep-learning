@@ -1,4 +1,5 @@
 import numpy as np
+import logging
 
 EPSILON = 1e-5
 
@@ -19,9 +20,13 @@ class GradientDescentResult:
 
     def __init__(self):
         self.snapshots = []
+        self.thetas = None
 
     def has_snapshots(self):
         return len(self.snapshots) > 0
+
+    def save_result(self, thetas):
+        self.thetas = thetas
 
     def save_snapshot(self, i, cost, loss, gradient, theta):
         self.snapshots = self.snapshots.append(GradientDescentSnapshot(i, cost, loss, gradient, theta))
@@ -56,6 +61,10 @@ class GradientDescentConfiguration:
     def is_save_snapshots(self):
         return self.is_save_snapshots
 
+    def __str__(self):
+        return str.format("Iterations count: %s\n Learning rate: %s\n Lambda value: %s\n Snapshot will be saving: %s\n",
+                          self.iterations_count(), self.lambda_value(), self.is_save_snapshots())
+
 
 # --- loss functions ---
 def linear_loss(h, y):
@@ -82,12 +91,14 @@ def logistic_loss(h, y):
 # ones line could be inserted BEFORE
 def gradient_descent(features, results, gd_config):
     """
+    Core of gradient descent execution
     Gradient descent realization that accepts features, results (Xs and Ys) and configuration for gradient descent
     :param features: Xs
     :param results: Ys
     :param gd_config: configuration to run gradient descent
     :return: packed gradient descent result, which has configured thetas and can has snapshots of execution
     """
+    logging.info("Running gradient descent with next params: %s", gd_config)
     m = len(features)
     thetas = np.ones((features.shape[1], 1))
     gd_result = GradientDescentResult()
@@ -105,4 +116,5 @@ def gradient_descent(features, results, gd_config):
         if gd_config.is_save_snapshots():
             gd_result.save_snapshot(i=i, cost=cost, loss=loss, gradient=gradient, theta=thetas)
 
+    gd_result.save_result(thetas=thetas)
     return gd_result
