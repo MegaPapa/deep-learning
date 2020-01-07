@@ -9,6 +9,7 @@ verify_ssl = true
 numpy = "*"
 tensorflow = "*"
 matplotlib = "*"
+wget = "*"
 
 [requires]
 python_version = "3.7"
