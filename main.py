@@ -6,11 +6,12 @@ from dl_5 import lab as lab5
 from dl_6 import lab as lab6
 from dl_7 import lab as lab7
 from dl_8 import lab as lab8
+from util.log.logging import configure_logging
 
 DEFAULT_RUNNABLE_LAB = "1"
 
-
 def main():
+    configure_logging()
     if DEFAULT_RUNNABLE_LAB == "-1":
         print("Which ML lab do you want to start?")
         user_input = input()

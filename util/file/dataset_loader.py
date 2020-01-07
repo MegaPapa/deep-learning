@@ -20,7 +20,7 @@ def prepare_dataset(url, save_as_name):
         os.mkdir(sources_path)
         filename = fetch_dataset(url, sources_path)
         unpacked_path = DATASETS_UNPACKED_ROOT + save_as_name
-        unpack_dataset(sources_path + "/" + filename, unpacked_path)
+        unpack_dataset(filename, unpacked_path)
 
 
 # fetch dataset from the URL
