@@ -10,6 +10,7 @@ from util.log.logging import configure_logging
 
 DEFAULT_RUNNABLE_LAB = "1"
 
+
 def main():
     configure_logging()
     if DEFAULT_RUNNABLE_LAB == "-1":

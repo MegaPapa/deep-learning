@@ -4,8 +4,10 @@ import logging
 EPSILON = 1e-5
 
 
-# snapshot of one gradient descent iteration
 class GradientDescentSnapshot:
+    """
+    Snapshot of one gradient descent iteration
+    """
 
     def __init__(self, iteration_num, cost_value, loss_value, gradient_value, theta):
         self.iteration_num = iteration_num
@@ -15,8 +17,10 @@ class GradientDescentSnapshot:
         self.theta = theta
 
 
-# container to contain result of gradient descent execution
 class GradientDescentResult:
+    """
+    Container to contain result of gradient descent execution
+    """
 
     def __init__(self):
         self.snapshots = []
@@ -32,8 +36,10 @@ class GradientDescentResult:
         self.snapshots = self.snapshots.append(GradientDescentSnapshot(i, cost, loss, gradient, theta))
 
 
-# configuration to run gradient descent
 class GradientDescentConfiguration:
+    """
+    Configuration to run gradient descent
+    """
 
     def __init__(self, iterations_count, loss_func, hypothesis_func, learning_rate, lambda_value, is_save_snapshots):
         self.iterations_count = iterations_count
