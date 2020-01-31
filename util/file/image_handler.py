@@ -1,5 +1,7 @@
 from PIL import Image
 import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 
 
 def load_image_into_numpy_array(img_path, mode="int32"):
@@ -26,3 +28,14 @@ def save_numpy_array_as_image(narray, path, mode="uint8", image_mode="L"):
     """
     img = Image.fromarray(np.asarray(np.clip(narray, 0, 255), dtype=mode), image_mode)
     img.save(path)
+
+
+def show_image(path):
+    """
+    Shows image which is placed on defined path
+    :param path: path to the image
+    """
+    img = mpimg.imread(path)
+    imgplot = plt.imshow(img)
+    plt.show()
+    plt.close()
