@@ -20,6 +20,14 @@ def prepare_dataset(url, save_as_name):
     :param url: url where resources is storing
     :param save_as_name: name of directory where it will be saved
     """
+    if not os.path.exists(DATASETS_SOURCES_ROOT):
+        logging.info("Dataset's source root doesn't exist, creating it...")
+        os.mkdir(DATASETS_SOURCES_ROOT)
+
+    if not os.path.exists(DATASETS_UNPACKED_ROOT):
+        logging.info("Dataset's unpacking directory doesn't exist, creating it...")
+        os.mkdir(DATASETS_UNPACKED_ROOT)
+
     logging.info("Start the dataset downloading...")
     sources_path = get_path_to_sources_dir(save_as_name)
     if os.path.exists(sources_path):
