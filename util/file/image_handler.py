@@ -1,4 +1,6 @@
-from PIL import Image
+from _md5 import md5
+
+from PIL import Image, ImageChops
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
@@ -39,3 +41,22 @@ def show_image(path):
     imgplot = plt.imshow(img)
     plt.show()
     plt.close()
+
+
+def calc_file_hash(filepath):
+    with open(filepath, 'rb') as f:
+        return md5(f.read()).hexdigest()
+
+
+def compare_images(first_img_path, second_img_path):
+    """
+    Compares two pictures and return result of comparing
+    :param first_img_path:
+    :param second_img_path:
+    :return: boolean
+    """
+    img1 = Image.open(first_img_path)
+    img2 = Image.open(second_img_path)
+
+    diff = ImageChops.difference(img1, img2)
+    print(diff.getbbox())
