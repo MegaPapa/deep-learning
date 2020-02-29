@@ -38,12 +38,12 @@ class Lab1(Runner):
 
         uniq_images = {}
         duplicate_images = {}
-        # (3)
+        # (4)
         logging.info("Start deleting duplicates...")
         for letter in const.LEARNING_LETTERS:
-            path_to_img_dir = get_path_to_unpacked_dir(const.SECOND_UNIQ_DATASET_PATH_NAME)\
+            path_to_img_dir = get_path_to_unpacked_dir(const.FIRST_UNIQ_DATASET_PATH_NAME)\
                           + "/"\
-                          + const.SECOND_UNIQ_DATASET_PATH_NAME\
+                          + const.FIRST_UNIQ_DATASET_PATH_NAME\
                           + "/"\
                           + letter
             files_in_dir = os.listdir(path_to_img_dir)
