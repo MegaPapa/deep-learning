@@ -3,10 +3,12 @@ import os
 import random
 
 import dl_1.const as const
+from util.data.data_gen import get_onehot_for_letter
 from util.file.dataset_loader import prepare_dataset, get_path_to_unpacked_dir
 from util.file.image_handler import show_image, calc_file_hash
 from util.runner import Runner
 import numpy as np
+from sklearn.linear_model import LogisticRegression
 
 
 class Lab1(Runner):
@@ -50,11 +52,12 @@ class Lab1(Runner):
                           + letter
             files_in_dir = os.listdir(path_to_img_dir)
             for file in files_in_dir:
-                hash = calc_file_hash(path_to_img_dir + "/" + file)
+                full_path = path_to_img_dir + "/" + file
+                hash = calc_file_hash(full_path)
                 if hash not in uniq_images:
-                    uniq_images[hash] = file
+                    uniq_images[hash] = full_path
                 else:
-                    duplicate_images[hash] = file
+                    duplicate_images[hash] = full_path
 
         logging.info("Was found %d duplicate images, total count of unique images = %d", len(duplicate_images), len(uniq_images))
 
@@ -71,9 +74,9 @@ class Lab1(Runner):
         validation_set_percentage = const.TRAIN_SET_PERCENTS + const.VALIDATION_SET_PERCENTS
         test_set_percentage = validation_set_percentage + const.TEST_SET_PERCENTS
 
+        logging.info("Start sorting by sets")
         for key in shuffled_images_keys:
             current_percentage = (count / len(shuffled_images_keys))
-            print(current_percentage)
             if current_percentage < training_set_percentage:
                 training_set.append(uniq_images[key])
             if training_set_percentage < current_percentage < validation_set_percentage:
@@ -81,5 +84,19 @@ class Lab1(Runner):
             if validation_set_percentage < current_percentage < test_set_percentage:
                 test_set.append(uniq_images[key])
             count += 1
+
+        logging.info(
+            "Total set was separted to 3 sets: training (%d - %d %%), validation (%d - %d %%) and test (%d - %d %%)",
+            len(training_set), const.TRAIN_SET_PERCENTS * 100,
+            len(validation_set), const.VALIDATION_SET_PERCENTS * 100,
+            len(test_set), const.TEST_SET_PERCENTS * 100
+        )
+        logging.info("Start fitting model (with logistic regression)...")
+        # (5)
+        logistic_regression = LogisticRegression()
+
+        logistic_regression.
+
+
 
 
