@@ -44,6 +44,11 @@ def show_image(path):
 
 
 def calc_file_hash(filepath):
+    """
+    Calculates hash of file
+    :param filepath: path to the file
+    :return: hash as string
+    """
     with open(filepath, 'rb') as f:
         return md5(f.read()).hexdigest()
 

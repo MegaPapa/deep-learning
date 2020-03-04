@@ -40,16 +40,49 @@ class Lab1(Runner):
         #         logging.error("Images have too much error!")
         #     logging.info("Classes have normal error. [letter %s , elements %s]", letter, images_count[letter])
 
+        # (3)
+
+        training_set = []
+        validation_set = []
+        test_set = []
+
+        logging.info("Start sorting by sets")
+        for letter in const.LEARNING_LETTERS:
+            hashes = []
+            path_to_img_dir = get_path_to_unpacked_dir(const.SECOND_UNIQ_DATASET_PATH_NAME) \
+                              + "/" \
+                              + const.SECOND_UNIQ_DATASET_PATH_NAME \
+                              + "/" \
+                              + letter
+            files_in_dir = list(map(lambda path: path_to_img_dir + "/" + path, os.listdir(path_to_img_dir)))
+            files_count = len(files_in_dir)
+            # calculate how many pics are going to each set
+            to_training = int(files_count * const.TRAIN_SET_PERCENTS)
+            to_validation = int(files_count * const.VALIDATION_SET_PERCENTS)
+            to_test = files_count - to_training - to_validation
+            # using slice put file paths to sets
+            training_set = training_set + files_in_dir[0: to_training - 1]
+            validation_set = validation_set + files_in_dir[to_training: to_training + to_validation - 1]
+            test_set = test_set + files_in_dir[to_training + to_validation: to_training + to_validation + to_test - 1]
+
+
+        logging.info(
+            "Total set was separted to 3 sets: training (%d - %d %%), validation (%d - %d %%) and test (%d - %d %%)",
+            len(training_set), const.TRAIN_SET_PERCENTS * 100,
+            len(validation_set), const.VALIDATION_SET_PERCENTS * 100,
+            len(test_set), const.TEST_SET_PERCENTS * 100
+        )
+
         uniq_images = {}
         duplicate_images = {}
         # (4)
         logging.info("Start deleting duplicates...")
         for letter in const.LEARNING_LETTERS:
-            path_to_img_dir = get_path_to_unpacked_dir(const.SECOND_UNIQ_DATASET_PATH_NAME)\
-                          + "/"\
-                          + const.SECOND_UNIQ_DATASET_PATH_NAME\
-                          + "/"\
-                          + letter
+            path_to_img_dir = get_path_to_unpacked_dir(const.SECOND_UNIQ_DATASET_PATH_NAME) \
+                              + "/" \
+                              + const.SECOND_UNIQ_DATASET_PATH_NAME \
+                              + "/" \
+                              + letter
             files_in_dir = os.listdir(path_to_img_dir)
             for file in files_in_dir:
                 full_path = path_to_img_dir + "/" + file
@@ -59,43 +92,31 @@ class Lab1(Runner):
                 else:
                     duplicate_images[hash] = full_path
 
-        logging.info("Was found %d duplicate images, total count of unique images = %d", len(duplicate_images), len(uniq_images))
+        logging.info("Was found %d duplicate images, total count of unique images = %d", len(duplicate_images),
+                     len(uniq_images))
 
-        # (3)
-        # shuffle keys to get random images sets at every run
-        shuffled_images_keys = uniq_images.keys()
-
-        training_set = []
-        validation_set = []
-        test_set = []
-        count = 0
-
-        training_set_percentage = const.TRAIN_SET_PERCENTS
-        validation_set_percentage = const.TRAIN_SET_PERCENTS + const.VALIDATION_SET_PERCENTS
-        test_set_percentage = validation_set_percentage + const.TEST_SET_PERCENTS
-
-        logging.info("Start sorting by sets")
-        for key in shuffled_images_keys:
-            current_percentage = (count / len(shuffled_images_keys))
-            if current_percentage < training_set_percentage:
-                training_set.append(uniq_images[key])
-            if training_set_percentage < current_percentage < validation_set_percentage:
-                validation_set.append(uniq_images[key])
-            if validation_set_percentage < current_percentage < test_set_percentage:
-                test_set.append(uniq_images[key])
-            count += 1
+        logging.info("Delete duplicated images from the sets")
+        for non_uniq_hash in duplicate_images:
+            non_uniq_path = duplicate_images[non_uniq_hash]
+            if non_uniq_path in training_set:
+                training_set.remove(non_uniq_path)
+            if non_uniq_path in validation_set:
+                validation_set.remove(non_uniq_path)
+            if non_uniq_path in test_set:
+                test_set.remove(non_uniq_path)
 
         logging.info(
-            "Total set was separted to 3 sets: training (%d - %d %%), validation (%d - %d %%) and test (%d - %d %%)",
-            len(training_set), const.TRAIN_SET_PERCENTS * 100,
-            len(validation_set), const.VALIDATION_SET_PERCENTS * 100,
-            len(test_set), const.TEST_SET_PERCENTS * 100
+            "Total count of sets after duplicate deleting: training: %d ; validation: %d ; test: %d",
+            len(training_set),
+            len(validation_set),
+            len(test_set)
         )
+
         logging.info("Start fitting model (with logistic regression)...")
         # (5)
         logistic_regression = LogisticRegression()
 
-        logistic_regression.
+
 
 
 
