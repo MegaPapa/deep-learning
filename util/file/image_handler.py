@@ -1,3 +1,4 @@
+import os
 from _md5 import md5
 
 from PIL import Image, ImageChops
@@ -5,6 +6,18 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
+
+def load_dataset_into_numpy_array(img_path, mode="int32"):
+    """
+    Translates all elements in path into numpy array
+    :param img_path: path to the translatable image
+    :param mode: mode of reading, by default has int32 value
+    :return: numpy array with image values
+    """
+    files = os.listdir(img_path)
+    result = np.asarray([])
+    for file in files:
+        load_image_into_numpy_array(img_path + "/" + file, mode)
 
 def load_image_into_numpy_array(img_path, mode="int32"):
     """
