@@ -1,6 +1,8 @@
+import logging
 import os
 from _md5 import md5
 
+import PIL
 from PIL import Image, ImageChops
 import numpy as np
 import matplotlib.pyplot as plt
@@ -17,7 +19,9 @@ def load_dataset_into_numpy_array(img_path, mode="int32"):
     files = os.listdir(img_path)
     result = np.asarray([])
     for file in files:
-        load_image_into_numpy_array(img_path + "/" + file, mode)
+        result = np.concatenate(result, load_image_into_numpy_array(img_path + "/" + file, mode).reshape((-1, 1)))
+    return result
+
 
 def load_image_into_numpy_array(img_path, mode="int32"):
     """
@@ -26,10 +30,15 @@ def load_image_into_numpy_array(img_path, mode="int32"):
     :param mode: mode of reading, by default has int32 value
     :return: numpy array with image values
     """
-    img = Image.open(img_path)
-    img.load()
-    data = np.asarray(img, dtype=mode)
-    return data
+    try:
+        img = Image.open(img_path)
+        img.load()
+        data = np.asarray(img, dtype=mode)
+        return data
+    except PIL.UnidentifiedImageError:
+        logging.warning("Can't load file! Deleting this file...")
+        os.remove(img_path)
+        return None
 
 
 def save_numpy_array_as_image(narray, path, mode="uint8", image_mode="L"):

@@ -1,11 +1,7 @@
 import logging
 import os
-import random
-
-from tensorflow import keras
 
 import dl_1.const as const
-from util.data.data_gen import get_onehot_for_letter
 from util.file.dataset_loader import prepare_dataset, get_path_to_unpacked_dir
 from util.file.image_handler import show_image, calc_file_hash, load_image_into_numpy_array
 from util.runner import Runner
@@ -43,14 +39,12 @@ class Lab1(Runner):
         #     logging.info("Classes have normal error. [letter %s , elements %s]", letter, images_count[letter])
 
         # (3)
-
         training_set = []
         validation_set = []
         test_set = []
 
         logging.info("Start sorting by sets")
         for letter in const.LEARNING_LETTERS:
-            hashes = []
             path_to_img_dir = get_path_to_unpacked_dir(const.SECOND_UNIQ_DATASET_PATH_NAME) \
                               + "/" \
                               + const.SECOND_UNIQ_DATASET_PATH_NAME \
@@ -75,9 +69,9 @@ class Lab1(Runner):
             len(test_set), const.TEST_SET_PERCENTS * 100
         )
 
+        # (4)
         uniq_images = {}
         duplicate_images = {}
-        # (4)
         logging.info("Start deleting duplicates...")
         for letter in const.LEARNING_LETTERS:
             path_to_img_dir = get_path_to_unpacked_dir(const.SECOND_UNIQ_DATASET_PATH_NAME) \
@@ -114,20 +108,39 @@ class Lab1(Runner):
             len(test_set)
         )
 
-        logging.info("Start training model (with logistic regression)...")
         # (5)
-        logistic_regression = LogisticRegression()
+        # Prepare y's
+        y = np.zeros((len(training_set), ))
         for letter in const.LEARNING_LETTERS:
-            onehot = get_onehot_for_letter(letter)
-            for path in training_set:
-                x = load_image_into_numpy_array(path)
-                logistic_regression.fit(x, onehot)
+            path_to_img_dir = get_path_to_unpacked_dir(const.SECOND_UNIQ_DATASET_PATH_NAME) \
+                              + "/" \
+                              + const.SECOND_UNIQ_DATASET_PATH_NAME \
+                              + "/" \
+                              + letter
+            # On every letter set their own number 0 - len(const.LEARNING_LETTERS),
+            # where 0 is A, 1 is B, C is 2 and so on
+            for index, path in enumerate(training_set):
+                if path.startswith(path_to_img_dir):
+                    y[index] = const.LEARNING_LETTERS.index(letter)
+        # Creates input values by concatenating of image values
+        x = np.asarray([])
+        for path in training_set[:]:
+            image_np_array = load_image_into_numpy_array(path)
+            # if file was deleted --- remove it from the set and from the y's
+            if image_np_array is None:
+                y = np.delete(y, [training_set.index(path)])
+                training_set.remove(path)
+                continue
+            if x.shape[0] == 0:
+                x = image_np_array.reshape((-1, 1))
+            else:
+                x = np.concatenate((x, image_np_array.reshape(-1, 1)), axis=1)
 
-            for path in validation_set:
-                x = load_image_into_numpy_array(path)
-                logistic_regression.fit(x, onehot)
-
-        is_a = logistic_regression.predict(test_set[0])
+        # Learning
+        logging.info("Start training model (with logistic regression)...")
+        logistic_regression = LogisticRegression()
+        logistic_regression.fit(x.T, y)
+        logistic_regression.predict(load_image_into_numpy_array(test_set[0]).reshape((-1, 1)).T)
         print(is_a)
 
 
