@@ -2,11 +2,13 @@ import logging
 import os
 
 import dl_1.const as const
-from util.file.dataset_loader import prepare_dataset, get_path_to_unpacked_dir
+from util.file.dataset_loader import prepare_dataset, get_path_to_unpacked_dir, load_numpy_array_from_file, \
+    load_numpy_array_into_file
 from util.file.image_handler import show_image, calc_file_hash, load_image_into_numpy_array
 from util.runner import Runner
 import numpy as np
-from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
+import sklearn.model_selection
 
 
 class Lab1(Runner):
@@ -18,9 +20,9 @@ class Lab1(Runner):
     def run(self):
         # images_count = {}
         # for letter in const.LEARNING_LETTERS:
-        #     path_to_img_dir = get_path_to_unpacked_dir(const.FIRST_UNIQ_DATASET_PATH_NAME)\
+        #     path_to_img_dir = get_path_to_unpacked_dir(const.SECOND_UNIQ_DATASET_PATH_NAME)\
         #                   + "/"\
-        #                   + const.FIRST_UNIQ_DATASET_PATH_NAME\
+        #                   + const.SECOND_UNIQ_DATASET_PATH_NAME\
         #                   + "/"\
         #                   + letter
         #     files_in_dir = os.listdir(path_to_img_dir)
@@ -43,7 +45,7 @@ class Lab1(Runner):
         validation_set = []
         test_set = []
 
-        logging.info("Start sorting by sets")
+        logging.info("Start sorting into sets")
         for letter in const.LEARNING_LETTERS:
             path_to_img_dir = get_path_to_unpacked_dir(const.SECOND_UNIQ_DATASET_PATH_NAME) \
                               + "/" \
@@ -110,41 +112,71 @@ class Lab1(Runner):
 
         # (5)
         # Prepare y's
-        y = np.zeros((len(training_set), ))
-        for letter in const.LEARNING_LETTERS:
-            path_to_img_dir = get_path_to_unpacked_dir(const.SECOND_UNIQ_DATASET_PATH_NAME) \
-                              + "/" \
-                              + const.SECOND_UNIQ_DATASET_PATH_NAME \
-                              + "/" \
-                              + letter
-            # On every letter set their own number 0 - len(const.LEARNING_LETTERS),
-            # where 0 is A, 1 is B, C is 2 and so on
-            for index, path in enumerate(training_set):
-                if path.startswith(path_to_img_dir):
-                    y[index] = const.LEARNING_LETTERS.index(letter)
+        y = load_numpy_array_from_file(const.SECOND_UNIQ_DATASET_PATH_NAME + "_y_training_set")
+        # if preloaded y's don't exist - create it
+        if y is None:
+            y = np.zeros((len(training_set), ))
+            for letter in const.LEARNING_LETTERS:
+                path_to_img_dir = get_path_to_unpacked_dir(const.SECOND_UNIQ_DATASET_PATH_NAME) \
+                                  + "/" \
+                                  + const.SECOND_UNIQ_DATASET_PATH_NAME \
+                                  + "/" \
+                                  + letter
+                # On every letter set their own number 0 - len(const.LEARNING_LETTERS),
+                # where 0 is A, 1 is B, C is 2 and so on
+                for index, path in enumerate(training_set):
+                    if path.startswith(path_to_img_dir):
+                        y[index] = const.LEARNING_LETTERS.index(letter)
+            load_numpy_array_into_file(y, const.SECOND_UNIQ_DATASET_PATH_NAME + "_y_training_set")
+
         # Creates input values by concatenating of image values
-        x = np.asarray([])
-        for path in training_set[:]:
-            image_np_array = load_image_into_numpy_array(path)
-            # if file was deleted --- remove it from the set and from the y's
-            if image_np_array is None:
-                y = np.delete(y, [training_set.index(path)])
-                training_set.remove(path)
-                continue
-            if x.shape[0] == 0:
-                x = image_np_array.reshape((-1, 1))
-            else:
-                x = np.concatenate((x, image_np_array.reshape(-1, 1)), axis=1)
+        x_train = load_numpy_array_from_file(const.SECOND_UNIQ_DATASET_PATH_NAME + "_x_training_set")
+        # if preloaded x_train's don't exist - create it
+        if x_train is None:
+            x_train = np.asarray([])
+            for path in training_set[:]:
+                image_np_array = load_image_into_numpy_array(path)
+                # if file was deleted --- remove it from the set and from the y's
+                if image_np_array is None:
+                    y = np.delete(y, [training_set.index(path)])
+                    training_set.remove(path)
+                    continue
+                if x_train.shape[0] == 0:
+                    x_train = image_np_array.reshape((-1, 1))
+                else:
+                    x_train = np.concatenate((x_train, image_np_array.reshape(-1, 1)), axis=1)
+            load_numpy_array_into_file(x_train, const.SECOND_UNIQ_DATASET_PATH_NAME + "_x_training_set")
 
         # Learning using scikit
         logging.info("Start training model (with logistic regression)...")
-        logistic_regression = LogisticRegression()
-        logistic_regression.fit(x.T, y)
-        # logistic_regression.predict(load_image_into_numpy_array(test_set[0]).reshape((-1, 1)).T)
+        # working configurations:
+        #   max_iter=1000000, solver='liblinear' - 31 min
+        #   max_iter=1000000, tol=1e-2 - 1m 40 sec
+        logistic_regression = LogisticRegressionCV(max_iter=1000000, tol=1e-2) # 1 mln
+        logistic_regression.fit(x_train.T, y)
+        logging.info("Model has been trained successfully!")
+        logistic_regression.predict(load_image_into_numpy_array(test_set[0]).reshape((-1, 1)).T)
         # print(is_a)
 
 
-
+    def load_features(self, dataset, dataset_name):
+        x = load_numpy_array_from_file(dataset_name)
+        # if preloaded x_train's don't exist - create it
+        if x is None:
+            x_train = np.asarray([])
+            for path in dataset[:]:
+                image_np_array = load_image_into_numpy_array(path)
+                # if file was deleted --- remove it from the set and from the y's
+                if image_np_array is None:
+                    y = np.delete(y, [dataset.index(path)])
+                    dataset.remove(path)
+                    continue
+                if x_train.shape[0] == 0:
+                    x_train = image_np_array.reshape((-1, 1))
+                else:
+                    x_train = np.concatenate((x_train, image_np_array.reshape(-1, 1)), axis=1)
+            load_numpy_array_into_file(dataset_name)
+        return x
 
 
 

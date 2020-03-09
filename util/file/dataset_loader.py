@@ -26,6 +26,7 @@ def load_numpy_array_into_file(np_array, dataset_uniq_name):
     """
     if not os.path.exists(SAVED_NUMPY_ARRAYS_PATH):
         logging.info("Package with prepared numpy arrays doesn't exist, creating it...")
+        os.mkdir(SAVED_NUMPY_ARRAYS_PATH)
     full_path = SAVED_NUMPY_ARRAYS_PATH + dataset_uniq_name + ".npy"
     logging.info("Saving numpy array into %s", full_path)
     np.save(full_path, np_array)
@@ -36,9 +37,12 @@ def load_numpy_array_from_file(dataset_uniq_name):
     """
     Loads numpy array from file
     :param dataset_uniq_name: name that will be used to load numpy array
-    :return: numpy array
+    :return: numpy array or None if file with numpy array doesn't exist
     """
     full_path = SAVED_NUMPY_ARRAYS_PATH + dataset_uniq_name + ".npy"
+    if not os.path.exists(full_path):
+        logging.info("Doesn't exist numpy array %s , skipping loading!", full_path)
+        return None
     logging.info("Loading prepared numpy array from %s", full_path)
     arr = np.load(full_path)
     logging.info("Numpy array was loaded successfully!")
