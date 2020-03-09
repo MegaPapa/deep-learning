@@ -136,12 +136,12 @@ class Lab1(Runner):
             else:
                 x = np.concatenate((x, image_np_array.reshape(-1, 1)), axis=1)
 
-        # Learning
+        # Learning using scikit
         logging.info("Start training model (with logistic regression)...")
         logistic_regression = LogisticRegression()
         logistic_regression.fit(x.T, y)
-        logistic_regression.predict(load_image_into_numpy_array(test_set[0]).reshape((-1, 1)).T)
-        print(is_a)
+        # logistic_regression.predict(load_image_into_numpy_array(test_set[0]).reshape((-1, 1)).T)
+        # print(is_a)
 
 
 

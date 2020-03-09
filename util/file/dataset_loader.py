@@ -3,15 +3,46 @@ import os
 import tarfile
 
 import wget
+import numpy as np
 
 DATASETS_SOURCES_ROOT = "./datasets/sources/"
 DATASETS_UNPACKED_ROOT = "./datasets/unpacked/"
+SAVED_NUMPY_ARRAYS_PATH = "./datasets/arrays/"
+
 
 def get_path_to_unpacked_dir(dir_name):
     return DATASETS_UNPACKED_ROOT + dir_name
 
+
 def get_path_to_sources_dir(dir_name):
     return DATASETS_SOURCES_ROOT + dir_name
+
+
+def load_numpy_array_into_file(np_array, dataset_uniq_name):
+    """
+    Loads numpy array into file to get it later
+    :param np_array: array that will be loaded in the file
+    :param dataset_uniq_name: special uniq name for that dataset
+    """
+    if not os.path.exists(SAVED_NUMPY_ARRAYS_PATH):
+        logging.info("Package with prepared numpy arrays doesn't exist, creating it...")
+    full_path = SAVED_NUMPY_ARRAYS_PATH + dataset_uniq_name + ".npy"
+    logging.info("Saving numpy array into %s", full_path)
+    np.save(full_path, np_array)
+    logging.info("Numpy array saved successfully!")
+
+
+def load_numpy_array_from_file(dataset_uniq_name):
+    """
+    Loads numpy array from file
+    :param dataset_uniq_name: name that will be used to load numpy array
+    :return: numpy array
+    """
+    full_path = SAVED_NUMPY_ARRAYS_PATH + dataset_uniq_name + ".npy"
+    logging.info("Loading prepared numpy array from %s", full_path)
+    arr = np.load(full_path)
+    logging.info("Numpy array was loaded successfully!")
+    return arr
 
 
 def prepare_dataset(url, save_as_name):
