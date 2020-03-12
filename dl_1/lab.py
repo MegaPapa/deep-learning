@@ -129,17 +129,71 @@ class Lab1(Runner):
 
         # Learning using scikit
         logging.info("Start training model (with logistic regression)...")
+        # self.train_on_n_examples(x_train, x_test, y, y_test, 50, 50)
+        # self.train_on_n_examples(x_train, x_test, y, y_test, 100, 100)
+        # self.train_on_n_examples(x_train, x_test, y, y_test, 1000, 1000)
+        set_50 = self.get_small_set(usable_dataset_name, training_set, 50)
+        y_output_name_50 = usable_dataset_name + "_y_training_set_50"
+        x_output_name_50 = usable_dataset_name + "_x_training_set_50"
+        y_50 = self.generate_outputs(usable_dataset_name, set_50, y_output_name_50)
+        x_50 = self.load_features(set_50, x_output_name_50, y_50)
+
+        set_100 = self.get_small_set(usable_dataset_name, training_set, 100)
+        y_output_name_100 = usable_dataset_name + "_y_training_set_100"
+        x_output_name_100 = usable_dataset_name + "_x_training_set_100"
+        y_100 = self.generate_outputs(usable_dataset_name, set_100, y_output_name_100)
+        x_100 = self.load_features(set_100, x_output_name_100, y_100)
+
+        set_1000 = self.get_small_set(usable_dataset_name, training_set, 1000)
+        y_output_name_1000 = usable_dataset_name + "_y_training_set_1000"
+        x_output_name_1000 = usable_dataset_name + "_x_training_set_1000"
+        y_1000 = self.generate_outputs(usable_dataset_name, set_1000, y_output_name_1000)
+        x_1000 = self.load_features(set_1000, x_output_name_1000, y_1000)
+
+        self.train_on_n_examples(x_50, x_test, y_50, y_test)
+        self.train_on_n_examples(x_100, x_test, y_100, y_test)
+        self.train_on_n_examples(x_1000, x_test, y_1000, y_test)
+        self.train_on_n_examples(x_train, x_test, y, y_test)
         # working configurations:
         #   max_iter=1000000, solver='liblinear' - 31 min
         #   max_iter=1000000, tol=1e-2 - 1m 40 sec
-        logistic_regression = LogisticRegression(max_iter=1000, tol=1e-2, C=0.5, solver='liblinear', penalty='l1') # 1 mln
-        logistic_regression.fit(x_train.T, y)
-        logging.info("Model has been trained successfully!")
-        score_result = logistic_regression.score(x_test.T, y_test)
-        score_result_2 = logistic_regression.score(x_train.T, y)
-        print(score_result)
+
         # logistic_regression.predict(load_image_into_numpy_array(test_set[0]).reshape((-1, 1)).T)
         # print(is_a)
+
+    def get_small_set(self, usable_dataset_name, set, size):
+        count_of_elements = 0
+        # index of element in new filtered set
+        element_num = 0
+        new_set = []
+        while size > count_of_elements:
+            for letter in const.LEARNING_LETTERS:
+                path_to_img_dir = get_path_to_unpacked_dir(usable_dataset_name) \
+                                  + "/" \
+                                  + usable_dataset_name \
+                                  + "/" \
+                                  + letter
+                filtered_set = list(filter(lambda el: el.startswith(path_to_img_dir), set))
+                new_set.append(filtered_set[element_num])
+                count_of_elements += 1
+            element_num += 1
+        return new_set
+
+
+    def train_on_n_examples(self, x_train, x_test, y_train, y_test):
+        train_examples_count = x_train.shape[1]
+        test_examples_count = x_test.shape[1]
+        logistic_regression = LogisticRegression(max_iter=1000, tol=1e-2, C=0.5, solver='liblinear',
+                                                 penalty='l1')  # 1 mln
+        logistic_regression.fit(x_train.T, y_train)
+        logging.info("Model has been trained successfully!")
+
+        score_result = logistic_regression.score(x_test.T, y_test)
+        score_result_2 = logistic_regression.score(x_train.T, y_train)
+        logging.info("Train examples count: %d", train_examples_count)
+        logging.info("Test examples count: %d", test_examples_count)
+        logging.info("Score on test data: %f", score_result)
+        logging.info("Score on train data: %f", score_result_2)
 
     def generate_outputs(self, usable_dataset_name, source_set, outputset_name):
         """
