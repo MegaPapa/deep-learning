@@ -9,6 +9,7 @@ from util.runner import Runner
 import numpy as np
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 import sklearn.model_selection
+import matplotlib.pyplot as plt
 
 
 class Lab1(Runner):
@@ -150,10 +151,14 @@ class Lab1(Runner):
         y_1000 = self.generate_outputs(usable_dataset_name, set_1000, y_output_name_1000)
         x_1000 = self.load_features(set_1000, x_output_name_1000, y_1000)
 
-        self.train_on_n_examples(x_50, x_test, y_50, y_test)
-        self.train_on_n_examples(x_100, x_test, y_100, y_test)
-        self.train_on_n_examples(x_1000, x_test, y_1000, y_test)
-        self.train_on_n_examples(x_train, x_test, y, y_test)
+        result_50 = self.train_on_n_examples(x_50, x_test, y_50, y_test)
+        result_100 = self.train_on_n_examples(x_100, x_test, y_100, y_test)
+        result_1000 = self.train_on_n_examples(x_1000, x_test, y_1000, y_test)
+        result_all = self.train_on_n_examples(x_train, x_test, y, y_test)
+        plt.ylabel('Accuracy')
+        plt.xlabel('Examples count')
+        plt.plot([result_50[0], result_100[0], result_1000[0], result_all[0]], [result_50[1], result_100[1], result_1000[1], result_all[1]])
+        plt.show()
         # working configurations:
         #   max_iter=1000000, solver='liblinear' - 31 min
         #   max_iter=1000000, tol=1e-2 - 1m 40 sec
@@ -194,6 +199,7 @@ class Lab1(Runner):
         logging.info("Test examples count: %d", test_examples_count)
         logging.info("Score on test data: %f", score_result)
         logging.info("Score on train data: %f", score_result_2)
+        return (train_examples_count, score_result)
 
     def generate_outputs(self, usable_dataset_name, source_set, outputset_name):
         """
