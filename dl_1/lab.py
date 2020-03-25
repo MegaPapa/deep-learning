@@ -19,8 +19,8 @@ class Lab1(Runner):
         prepare_dataset(const.SECOND_DATASET_URL, const.SECOND_UNIQ_DATASET_PATH_NAME)
 
     def run(self):
-        usable_dataset_name = const.FIRST_UNIQ_DATASET_PATH_NAME
-        usable_dataset_url = const.FIRST_DATASET_URL
+        usable_dataset_name = const.SECOND_UNIQ_DATASET_PATH_NAME
+        usable_dataset_url = const.SECOND_DATASET_URL
         # images_count = {}
         # for letter in const.LEARNING_LETTERS:
         #     path_to_img_dir = get_path_to_unpacked_dir(usable_dataset_name)\
