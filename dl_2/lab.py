@@ -38,6 +38,7 @@ class Lab2(Runner):
               loss='sparse_categorical_crossentropy',
               metrics=['accuracy'])
         model.fit(x=x_train, y=y)
+        model.predict()
 
 
 
