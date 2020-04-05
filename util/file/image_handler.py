@@ -7,6 +7,7 @@ from PIL import Image, ImageChops
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
+from keras_preprocessing.image import load_img, img_to_array
 
 
 def load_dataset_into_numpy_array(img_path, mode="int32"):
@@ -87,3 +88,17 @@ def compare_images(first_img_path, second_img_path):
 
     diff = ImageChops.difference(img1, img2)
     print(diff.getbbox())
+
+
+def load_image(filename, image_size):
+    w, h = image_size
+    # load the image
+    img = load_img(filename, target_size=(w, h))
+    # convert to array
+    img = img_to_array(img)
+    # reshape into a single sample with 3 channels
+    img = img.reshape(1, w, h, 3)
+    # center pixel data
+    img = img.astype('float32')
+    # img = img - [123.68, 116.779, 103.939]
+    return img
