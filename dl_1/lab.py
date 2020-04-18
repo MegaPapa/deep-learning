@@ -21,27 +21,27 @@ class Lab1(Runner):
     def run(self):
         usable_dataset_name = const.SECOND_UNIQ_DATASET_PATH_NAME
         usable_dataset_url = const.SECOND_DATASET_URL
-        # images_count = {}
-        # for letter in const.LEARNING_LETTERS:
-        #     path_to_img_dir = get_path_to_unpacked_dir(usable_dataset_name)\
-        #                   + "/"\
-        #                   + usable_dataset_name\
-        #                   + "/"\
-        #                   + letter
-        #     files_in_dir = os.listdir(path_to_img_dir)
-        #     path_to_img = path_to_img_dir + "/" + files_in_dir[0]
-        #     # (1)
-        #     show_image(path_to_img)
-        #     # save count of images in letter in map
-        #     images_count[letter] = len(files_in_dir)
-        #
-        # #(2)
-        # print(images_count)
-        # base = images_count[const.LEARNING_LETTERS[0]]
-        # for letter in const.LEARNING_LETTERS:
-        #     if images_count[letter] - base > const.CLASSES_DIFFERENCE_ERROR:
-        #         logging.error("Images have too much error!")
-        #     logging.info("Classes have normal error. [letter %s , elements %s]", letter, images_count[letter])
+        images_count = {}
+        for letter in const.LEARNING_LETTERS:
+            path_to_img_dir = get_path_to_unpacked_dir(usable_dataset_name)\
+                          + "/"\
+                          + usable_dataset_name\
+                          + "/"\
+                          + letter
+            files_in_dir = os.listdir(path_to_img_dir)
+            path_to_img = path_to_img_dir + "/" + files_in_dir[0]
+            # (1)
+            show_image(path_to_img)
+            # save count of images in letter in map
+            images_count[letter] = len(files_in_dir)
+
+        #(2)
+        print(images_count)
+        base = images_count[const.LEARNING_LETTERS[0]]
+        for letter in const.LEARNING_LETTERS:
+            if images_count[letter] - base > const.CLASSES_DIFFERENCE_ERROR:
+                logging.error("Images have too much error!")
+            logging.info("Classes have normal error. [letter %s , elements %s]", letter, images_count[letter])
 
         # (3)
         training_set = []

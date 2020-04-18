@@ -8,7 +8,7 @@ from dl_7 import lab as lab7
 from dl_8 import lab as lab8
 from util.log.logging import configure_logging
 
-DEFAULT_RUNNABLE_LAB = "2"
+DEFAULT_RUNNABLE_LAB = "1"
 
 
 def main():
